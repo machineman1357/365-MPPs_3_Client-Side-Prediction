@@ -1,0 +1,49 @@
+:root {
+    --cursorPointer_width: 12px;
+}
+
+#cursors_container {
+}
+
+.cursor_container_template {
+    display: none;
+}
+
+.cursor_container {
+    width: 50px;
+    height: 50px;
+    position: absolute;
+    pointer-events: none;
+    user-select: none;
+}
+
+.cursor_background {
+    width: 100%;
+    height: 100%;
+    clip-path: polygon(
+        0 0,
+        1% 34%,
+        10% 26%,
+        15% 37%,
+        19% 35%,
+        14% 25%,
+        24% 25%
+    );
+    position: absolute;
+    transform-origin: top left;
+}
+
+.cursor_image {
+    position: absolute;
+    transform-origin: top left;
+}
+
+.cursor_name {
+    color: black;
+    position: absolute;
+    left: 0;
+    top: 20px;
+    transform: translate(calc(-50% + var(--cursorPointer_width) / 2), 0);
+    font-size: 12px;
+    width: max-content;
+}
