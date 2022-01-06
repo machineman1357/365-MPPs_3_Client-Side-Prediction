@@ -8,8 +8,9 @@ export function cursor_initialize() {
     );
 }
 
-const stepsNeededForRotate = 15;
+const stepsNeededForRotate = 2;
 const extraRotationDegree = 25;
+const OTHER_PLAYER_CURSOR_POSITION_LERP_RATE = 0.5;
 
 export class Cursor {
     constructor(options) {
@@ -54,12 +55,13 @@ export class Cursor {
     }
 
     moveCursor(x, y) {
+        this.containerEl.style.left = this.position.x + "px";
+        this.containerEl.style.top = this.position.y + "px";
+    }
+
+    setPosition(x, y) {
         this.position.x = x;
         this.position.y = y;
-
-        this.containerEl.style.left = x + "px";
-        this.containerEl.style.top = y + "px";
-        this.rotateCursor();
     }
 
     rotateCursor() {
@@ -88,12 +90,36 @@ export class Cursor {
     update() {
         this.lastPosition.x = this.position.x;
         this.lastPosition.y = this.position.y;
+        this.moveCursor();
 
-        
+        this.rotateCursor();
     }
 
     destroy() {
         this.containerEl.remove();
+    }
+}
+
+export class OtherPlayerCursor extends Cursor {
+    constructor(options) {
+        super(options);
+
+        this.lastReceivedPosition = { x: 0, y: 0 };
+    }
+
+    setLastReceivedPosition(x, y) {
+        this.lastReceivedPosition.x = x;
+        this.lastReceivedPosition.y = y;
+    }
+
+    update() {
+        super.update();
+
+        const lerp = (x, y, a) => x * (1 - a) + y * a;
+        this.setPosition(
+            lerp(this.position.x, this.lastReceivedPosition.x, OTHER_PLAYER_CURSOR_POSITION_LERP_RATE),
+            lerp(this.position.y, this.lastReceivedPosition.y, OTHER_PLAYER_CURSOR_POSITION_LERP_RATE)
+        );
     }
 }
 
