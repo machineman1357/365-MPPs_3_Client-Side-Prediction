@@ -1,2 +1,0 @@
-Day 1 (2022-01-03):
-    - time it took: ~10 hours, because I spent a lot of time trying out typescript, web pack, parcel, and template projects, but ended up going vanilla js and socket and no Phaser at all
