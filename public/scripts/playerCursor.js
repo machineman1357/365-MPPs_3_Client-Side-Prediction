@@ -13,7 +13,7 @@ function create_playerCursor() {
 	// set move event
 	document.body.addEventListener("mousemove", function(ev) {
         if(socket && players[socket.id]) {
-            players[socket.id].cursor.moveCursor(ev.clientX, ev.clientY);
+            players[socket.id].cursor.setPosition(ev.clientX, ev.clientY);
         }
 	});
 

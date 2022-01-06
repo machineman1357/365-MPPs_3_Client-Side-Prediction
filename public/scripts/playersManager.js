@@ -14,11 +14,12 @@ export function removePlayer(socketID) {
 }
 
 export function update_playerCursors() {
-    const otherPlayerKeys = Object.keys(players);
-    otherPlayerKeys.forEach(playerKey => {
+    const playerKeys = Object.keys(players);
+    for (let i = 0; i < playerKeys.length; i++) {
+        const playerKey = playerKeys[i];
         const player = players[playerKey];
         player.cursor.update();
-    });
+    }
 }
 
 class Player {

@@ -11,6 +11,7 @@ export function cursor_initialize() {
 }
 
 const extraRotationDegree = 25;
+const OTHER_PLAYER_CURSOR_POSITION_LERP_RATE = 0.5;
 
 export class Cursor {
     constructor(options) {
@@ -56,12 +57,13 @@ export class Cursor {
     }
 
     moveCursor(x, y) {
+        this.containerEl.style.left = this.position.x + "px";
+        this.containerEl.style.top = this.position.y + "px";
+    }
+
+    setPosition(x, y) {
         this.position.x = x;
         this.position.y = y;
-
-        this.containerEl.style.left = x + "px";
-        this.containerEl.style.top = y + "px";
-        this.rotateCursor();
     }
 
     setRotation_deg(degree) {
@@ -98,8 +100,9 @@ export class Cursor {
     update() {
         this.lastPosition.x = this.position.x;
         this.lastPosition.y = this.position.y;
+        this.moveCursor();
 
-        
+        this.rotateCursor();
     }
 
     destroy() {

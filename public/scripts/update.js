@@ -4,6 +4,7 @@ import { update_playerCursors } from "./playersManager.js";
 export let delta;
 export let timeElapsed = 0;
 let lastDate = new Date();
+const SEND_POSITION_INTERVAL_PER_SECOND = 20;
 
 export let sendPositionIntervalRate_ms = 100;
 let sendPositionInterval;
