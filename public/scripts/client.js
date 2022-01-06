@@ -1,4 +1,4 @@
-import { Cursor } from "./cursor.js";
+import { Cursor, OtherPlayerCursor } from "./cursor.js";
 import { setBodyColor } from "./main.js";
 import { localPlayerCursor } from "./playerCursor.js";
 import { addPlayer, players, removePlayer } from "./playersManager.js";
@@ -17,14 +17,13 @@ socket.on("disconnect", (reason) => {
     }
 });
 socket.on("randomColorDegree", (colorDegree) => {
-    console.log("rand", players, socket.id);
     if (players[socket.id]) {
         players[socket.id].cursor.setCursorColor(colorDegree);
         setBodyColor("colorDegree", [players[socket.id].cursor.colorDegree]);
     }
 });
 socket.on("playerConnected", (colorDegree, socketID) => {
-    const playerCursor = new Cursor({
+    const playerCursor = new OtherPlayerCursor({
         colorDegree: colorDegree
     });
     playerCursor.setCursorColor(playerCursor.colorDegree);
@@ -38,7 +37,7 @@ socket.on("otherPlayers", (otherPlayers) => {
     otherPlayers.forEach(player => {
         const playerID = player[0];
         const playerColorDegree = player[1];
-        const playerCursor = new Cursor({
+        const playerCursor = new OtherPlayerCursor({
             colorDegree: playerColorDegree
         });
         playerCursor.setCursorColor(playerCursor.colorDegree);
@@ -46,5 +45,5 @@ socket.on("otherPlayers", (otherPlayers) => {
     });
 });
 socket.on("setPlayerPosition", (socketID, x, y) => {
-    players[socketID].cursor.moveCursor(x, y);
+    players[socketID].cursor.setLastReceivedPosition(x, y);
 });
