@@ -10,3 +10,7 @@
 ## Day 2 (2021-01-05)
     - time it took: ~2 hours
     - naive interpolation by interpolating the other players' position from their current position to the last received position. I call this "naive" because if these is latency between packets, then although the movement is smooth, it still jumps.
+
+## Day 3 (2021-01-06)
+    - time it took: ~1.25 hours
+    - added a slider that controls the client's rate at which to send position payloads to server
