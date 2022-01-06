@@ -2,6 +2,7 @@ import { cursor_initialize } from "./cursor.js";
 import { playerCursor_initialize } from "./playerCursor.js";
 import "./client.js";
 import { update_initialize } from "./update.js";
+import { tweakpane_start } from "./tweakpane.js";
 
 function initialize() {
 	cursor_initialize();
@@ -10,7 +11,7 @@ function initialize() {
 }
 
 function start() {
-
+    tweakpane_start();
 }
 
 initialize();
