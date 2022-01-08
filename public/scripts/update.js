@@ -1,10 +1,11 @@
+import { socket } from "./client.js";
 import { sendPosition } from "./playerCursor.js";
 import { update_playerCursors } from "./playersManager.js";
 
 export let delta;
 export let timeElapsed = 0;
 let lastDate = new Date();
-const SEND_POSITION_INTERVAL_PER_SECOND = 20;
+const SEND_RTT_INTERVAL_MS = 1000;
 
 export let sendPositionIntervalRate_ms = 100;
 let sendPositionInterval;
@@ -12,6 +13,7 @@ let sendPositionInterval;
 export function update_initialize() {
 	setInterval(update, 1000 / 30);
     setSendPositionInterval(sendPositionIntervalRate_ms);
+    setInterval(sendRTTInterval, SEND_RTT_INTERVAL_MS);
 }
 
 function update() {
@@ -36,4 +38,8 @@ export function setSendPositionInterval(newSendPositionIntervalRate_ms) {
     }
     sendPositionIntervalRate_ms = newSendPositionIntervalRate_ms;
     sendPositionInterval = setInterval(sendPosition, sendPositionIntervalRate_ms);
+}
+
+function sendRTTInterval() {
+    socket.emit("requestRTT", Date.now());
 }
