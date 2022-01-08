@@ -2,7 +2,7 @@ import express from "express";
 import { createServer } from "http";
 import path from "path";
 import { Server } from "socket.io";
-import { onPlayerConnected, onPlayerDisconnected } from "./eventsFiltering.js";
+import { addPlayer, players, removePlayer } from "./playersManager.js";
 
 const app = express();
 const server = createServer(app);
@@ -17,13 +17,36 @@ app.use(express.static("public"));
 io.on("connection", (socket) => {
     onPlayerConnected(socket);
     socket.on("disconnect", () => {
-        onPlayerDisconnected(socket);
+        removePlayer(socket);
+        socket.broadcast.emit("playerDisconnected", socket.id);
     });
     socket.on("receivePlayerPosition", (x, y) => {
         socket.broadcast.emit("setPlayerPosition", socket.id, x, y);
+    });
+    socket.on("requestRTT", (timeSent) => {
+        socket.emit("sendRTT", timeSent, Date.now(), Date.now() - timeSent);
     });
 });
 
 server.listen(3000, () => {
     console.log("listening on *:3000");
 });
+
+function onPlayerConnected(socket) {
+    const player = addPlayer(socket);
+    // tell all clients except sender of their joining
+    socket.broadcast.emit("playerConnected", player.colorDegree, socket.id);
+    // tell sender of other players
+    socket.emit("otherPlayers", getOtherPlayers(socket));
+}
+
+function getOtherPlayers(socket) {
+    const otherPlayerKeys = Object.keys(players);
+    const otherPlayers = otherPlayerKeys.map((playerKey) => {
+        const player = players[playerKey];
+        if(player.socketID !== socket.id) {
+            return [player.socketID, player.colorDegree];
+        }; 
+    }).filter(player => player ? true : false);
+    return otherPlayers;
+}
