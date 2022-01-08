@@ -14,3 +14,7 @@
 ## Day 3 (2021-01-06)
     - time it took: ~1.25 hours
     - added a slider that controls the client's rate at which to send position payloads to server
+
+## Day 4 (2021-01-07)
+    - time it took: ~1 hours
+    - added message that calculates latency between C (Client) & S (Server), S & C, and RTT (Round Trip Time)
