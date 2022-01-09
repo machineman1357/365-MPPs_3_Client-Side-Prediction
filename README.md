@@ -22,3 +22,7 @@
 ## Day 5 (2021-01-08)
     - time it took: ~1 hours
     - added pseudo code for a prediction algorithm
+
+## Day 5 (2021-01-09)
+    - time it took: ~1 hours
+    - finished adding the prediction algorithm using website
