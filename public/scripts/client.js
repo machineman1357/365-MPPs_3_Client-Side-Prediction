@@ -48,5 +48,5 @@ socket.on("setPlayerPosition", (socketID, x, y) => {
     players[socketID].cursor.setLastReceivedPosition(x, y);
 });
 socket.on("sendRTT", (timeSent, serverReceivedTime, clientToServerTime) => {
-    console.log("C => S: " + clientToServerTime, "S => C: " + (Date.now() - serverReceivedTime), "RTT: " + (serverReceivedTime - timeSent));
+    // console.log("C => S: " + clientToServerTime, "S => C: " + (Date.now() - serverReceivedTime), "RTT: " + (serverReceivedTime - timeSent));
 });
