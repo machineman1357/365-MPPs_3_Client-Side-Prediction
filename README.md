@@ -18,3 +18,7 @@
 ## Day 4 (2021-01-07)
     - time it took: ~1 hours
     - added message that calculates latency between C (Client) & S (Server), S & C, and RTT (Round Trip Time)
+
+## Day 5 (2021-01-08)
+    - time it took: ~1 hours
+    - added pseudo code for a prediction algorithm
