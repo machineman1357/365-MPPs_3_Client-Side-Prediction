@@ -8,12 +8,7 @@ const app = express();
 const server = createServer(app);
 export const io = new Server(server);
 const __dirname = path.resolve();
-
-// Use the variables to denote player state
-var DISCONNECTED = 0;
-var CONNECTED = 1;
-var READY = 2;
-var LEVEL_LOADED = 3;
+const updateIntervalRate_ms = 1000 / 30;
 
 app.get("/", (req, res) => {
     res.sendFile(__dirname + "/index.html");
@@ -25,12 +20,10 @@ io.on("connection", (socket) => {
     socket.on("disconnect", () => {
         removePlayer(socket);
         socket.broadcast.emit("playerDisconnected", socket.id);
-        pendingChanges.players[client.id].state.push(DISCONNECTED);
     });
 
-    pendingChanges.players[client.id] = {
+    pendingChanges.players[socket.id] = {
         moves: [],
-        state: [CONNECTED],
     };
 
     socket.on("receivePlayerPosition", (x, y) => {
@@ -72,82 +65,53 @@ function getOtherPlayers(socket) {
     return otherPlayers;
 }
 
-setInterval(update, 1000 / 30);
+setInterval(update, updateIntervalRate_ms);
 
 // Incoming changes are batched up and aplied to the worldState at the beginning of each tick.
 // These changes include player moves, connections and disconnections.
 var pendingChanges = {
     players: {},
-    ball: [],
 };
 
 let prevTS = 0;
 function update() {
-    // de-queue the pending player state changes (disconnections, etc)
-    var clientIds = Object.keys(pendingChanges.players);
-    clientIds.forEach(function (clientId) {
-        var stateChanges = pendingChanges.players[clientId].state;
+    for (
+        let playerIds = Object.keys(players), i = 0, len = playerIds.length;
+        i < len;
+        i++
+    ) {
+        const playerId = playerIds[i];
+        const player = players[playerId];
+        // Calculate time elapsed since last tick was processed
+        const now = Date.now();
+        const delta = Date.now() - prevTS;
+        prevTS = now;
 
-        while (stateChanges.length > 0) {
-            var state = stateChanges.shift();
+        var message = {};
+        message.clientAdjust = [];
 
-            // Disconnected
-            if (state === DISCONNECTED) {
-                // remove disconnected player
-                delete pendingChanges.players[clientId];
+        // Reference the player and the player's pending moves from the
+        // game state
+        var pendingMoves = pendingChanges.players[playerId].moves;
 
-                return;
-            }
-        }
-    });
-
-    // elapsed time
-    var now = Date.now();
-    var delta = now - prevTs;
-    prevTs = now;
-
-    // paddle moves
-    message.players = {};
-    _.each(worldState.players, function (playerState, clientId) {
-        var entity = playerState.entity;
-        var oldx = entity.x;
-        var pendingMoves = pendingChanges.players[clientId].moves;
-
-        // de-queue all the accumulated player moves
         var ack;
+        // Process all pending moves, which came from the client before
+        // the start of this tick, and update the game state
         while (pendingMoves.length > 0) {
             var move = pendingMoves.shift();
-            var ack = move.ts;
-            // Speed is 600 pixels / second, or 0.6 pixels / millisecond
-            entity.vx = move.dir * 0.6;
-            entity.update(delta);
-
-            // Handle left/right wall collisions:
-            if (entity.right > GAME_WIDTH) {
-                entity.setX(GAME_WIDTH - entity.w / 2);
-            }
-
-            if (entity.left < 0) {
-                entity.setX(entity.w / 2);
-            }
+            player.x = player.x + move.dir * 0.6 * delta;
+            ack = move.ts;
         }
 
-        // Only send an adjustment if the x coordinate has changed.
-        // Use the ts of the last processed client message to notify
-        // the client that it was the last message processed.
-        // if (oldx !== entity.x) {
-        message.clientAdjust = message.clientAdjust || [];
+        // Send a message back to client with the newly calculated position.
+        // Attach the timestamp of the most recently processed client move.
         message.clientAdjust.push({
-            id: clientId,
+            id: playerId,
             ts: ack,
-            x: entity.x,
+            x: player.x,
         });
-        //}
 
-        // Add player telemetry to outgoing message
-        message.players[clientId] = {
-            x: entity.x,
-            y: entity.y,
-        };
-    });
+        // Send message back to client
+        io.emit("gameState", message);
+    }
 }

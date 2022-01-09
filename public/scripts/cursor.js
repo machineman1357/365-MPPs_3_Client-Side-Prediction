@@ -12,6 +12,7 @@ export function cursor_initialize() {
 
 const extraRotationDegree = 25;
 const OTHER_PLAYER_CURSOR_POSITION_LERP_RATE = 0.5;
+const moveSpeed = 10;
 
 export class Cursor {
     constructor(options) {
@@ -27,6 +28,10 @@ export class Cursor {
         this.lastPositionForRotation = { x: 0, y: 0 };
         this.rotation_deg = 0;
         this.targetRotation_deg = 0;
+        this.targetRotationXY = {
+            x: 0,
+            y: 0,
+        };
         this.colorDegree = options.colorDegree || 0;
         this.name;
 
@@ -56,7 +61,7 @@ export class Cursor {
         this.cursorBackgroundEl.style.backgroundColor = "hsl(0deg 0% 100%)";
     }
 
-    moveCursor(x, y) {
+    moveCursor() {
         this.containerEl.style.left = this.position.x + "px";
         this.containerEl.style.top = this.position.y + "px";
     }
@@ -64,6 +69,29 @@ export class Cursor {
     setPosition(x, y) {
         this.position.x = x;
         this.position.y = y;
+    }
+
+    setTargetRotationFromPointer(pointerX, pointerY) {
+        const { x, y, angle } = getNormalizedDirectionAndAngle(
+            this.position.x,
+            this.position.y,
+            pointerX,
+            pointerY,
+        );
+        this.targetRotation_deg = (angle * 180) / Math.PI;
+        this.targetRotation_deg -= extraRotationDegree + 180;
+        this.targetRotation_deg *= -1;
+
+        this.targetRotationXY.x = x;
+        this.targetRotationXY.y = y;
+    }
+
+    setPositionFromTargetRotation() {
+        const newPos = {
+            x: this.targetRotationXY.x * moveSpeed + this.position.x,
+            y: this.targetRotationXY.y * moveSpeed + this.position.y,
+        };
+        this.setPosition(newPos.x, newPos.y);
     }
 
     setRotation_deg(degree) {
@@ -81,14 +109,6 @@ export class Cursor {
         ) {
             return;
         }
-        const { x, y, angle } = getNormalizedDirectionAndAngle(
-            this.position.x,
-            this.position.y,
-            this.lastPositionForRotation.x,
-            this.lastPositionForRotation.y
-        );
-        this.targetRotation_deg = (-angle * 180) / Math.PI;
-        this.targetRotation_deg += extraRotationDegree;
         this.setRotation_deg(
             LerpDegrees(this.rotation_deg, this.targetRotation_deg, 0.5)
         );
@@ -100,6 +120,7 @@ export class Cursor {
     update() {
         this.lastPosition.x = this.position.x;
         this.lastPosition.y = this.position.y;
+        this.setPositionFromTargetRotation();
         this.moveCursor();
 
         this.rotateCursor();

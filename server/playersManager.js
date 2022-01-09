@@ -21,6 +21,7 @@ export function removePlayer(socket) {
 class Player {
     constructor(socketID) {
         this.socketID = socketID;
-        this.moves = [];
+        this.x = 0;
+        this.y = 0;
     }
 }

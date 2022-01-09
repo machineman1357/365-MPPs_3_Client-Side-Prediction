@@ -1,3 +1,4 @@
+import { handleReceivedGameState } from "./clientSidePrediction.js";
 import { Cursor, OtherPlayerCursor } from "./cursor.js";
 import { setBodyColor } from "./main.js";
 import { localPlayerCursor } from "./playerCursor.js";
@@ -24,7 +25,7 @@ socket.on("randomColorDegree", (colorDegree) => {
 });
 socket.on("playerConnected", (colorDegree, socketID) => {
     const playerCursor = new OtherPlayerCursor({
-        colorDegree: colorDegree
+        colorDegree: colorDegree,
     });
     playerCursor.setCursorColor(playerCursor.colorDegree);
     addPlayer(socketID, playerCursor);
@@ -34,11 +35,11 @@ socket.on("playerDisconnected", (socketID) => {
 });
 socket.on("otherPlayers", (otherPlayers) => {
     // console.log("otherPlayers", otherPlayers);
-    otherPlayers.forEach(player => {
+    otherPlayers.forEach((player) => {
         const playerID = player[0];
         const playerColorDegree = player[1];
         const playerCursor = new OtherPlayerCursor({
-            colorDegree: playerColorDegree
+            colorDegree: playerColorDegree,
         });
         playerCursor.setCursorColor(playerCursor.colorDegree);
         addPlayer(playerID, playerCursor);
@@ -49,4 +50,7 @@ socket.on("setPlayerPosition", (socketID, x, y) => {
 });
 socket.on("sendRTT", (timeSent, serverReceivedTime, clientToServerTime) => {
     // console.log("C => S: " + clientToServerTime, "S => C: " + (Date.now() - serverReceivedTime), "RTT: " + (serverReceivedTime - timeSent));
+});
+socket.on("gameState", (clientsAdjust) => {
+    handleReceivedGameState(clientsAdjust);
 });

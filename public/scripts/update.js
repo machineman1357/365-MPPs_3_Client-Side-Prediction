@@ -7,12 +7,13 @@ export let delta;
 export let timeElapsed = 0;
 let lastDate = new Date();
 const SEND_RTT_INTERVAL_MS = 1000;
+const updateIntervalRate_ms = 1000 / 30;
 
 export let sendPositionIntervalRate_ms = 100;
 let sendPositionInterval;
 
 export function update_initialize() {
-    setInterval(update, 1000 / 30);
+    setInterval(update, updateIntervalRate_ms);
     setSendPositionInterval(sendPositionIntervalRate_ms);
     setInterval(sendRTTInterval, SEND_RTT_INTERVAL_MS);
 }
